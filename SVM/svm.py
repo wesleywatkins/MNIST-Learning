@@ -3,7 +3,6 @@
 
 # Import and Initializations
 import cvxpy
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import style
@@ -13,7 +12,7 @@ style.use('ggplot')
 data_count = 0
 with open('toyData.txt') as f:
     for line in f:
-        if line[0] == '#':
+        if line[0] == '#' or len(line) == 0:
             continue
         data_count += 1
 
