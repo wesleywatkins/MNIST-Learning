@@ -4,47 +4,26 @@
 # Import and Initializations
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import style
-from svm import SVM
-style.use('ggplot')
+from svm import SupportVectorMachine
 
-# setup data dictionary
-data = dict()
+# seed random number generator (last 8 of lib #)
+np.random.seed(79019719)
+n = 2
+m = 200
+u_pos = [-1, -1]
+u_neg = [1, 1]
+co_variance = [[1, 1], [1, 1]]
 
-# Count Data
-data_count = 0
-with open('toyData.txt') as f:
-    for line in f:
-        if line[0] == '#':
-            continue
-        line = line.rstrip()
-        temp = line.split(' ')
-        if len(temp) != 3:
-            continue
-        data_count += 1
+A = np.zeros((m, n))
+B = np.zeros((m, n))
+for i in range(0, m):
+    val_pos = np.random.normal(u_pos, co_variance, (1, n))
+    val_neg = np.random.normal(u_neg, co_variance, (1, n))
+    A[i] = val_pos
+    B[i] = val_neg
 
-# Array Setup
-x_values = np.zeros((data_count, 2))
-y_values = np.zeros(data_count)
+data = {1: A, -1: B}
 
-# Parse and Read Data
-index = 0
-with open('toyData.txt') as f:
-    for line in f:
-        if line[0] == '#':
-            continue
-        line = line.rstrip()
-        temp = line.split(' ')
-        if len(temp) == 3:
-            x_values[index, 0] = int(temp[0])
-            x_values[index, 1] = int(temp[1])
-            y_values[index] = int(temp[2])
-            index += 1
-
-# plot the data
-for i in range(0, data_count):
-    if y_values[i] == -1:
-        plt.plot(x_values[i, 0], x_values[i, 1], 'ro')
-    else:
-        plt.plot(x_values[i, 0], x_values[i, 1], 'bo')
-plt.show()
+svm = SupportVectorMachine()
+svm.train(data, n)
+svm.visualize()
