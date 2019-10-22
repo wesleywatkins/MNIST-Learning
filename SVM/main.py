@@ -4,26 +4,25 @@
 # Import and Initializations
 import numpy as np
 import matplotlib.pyplot as plt
+import data as d
 from svm import SupportVectorMachine
 
-# seed random number generator (last 8 of lib #)
-np.random.seed(79019719)
-n = 2
-m = 200
-u_pos = [-1, -1]
-u_neg = [1, 1]
-co_variance = [[1, 1], [1, 1]]
+# Generate sample data
+print("Generating data...")
+X, Y = d.gen_data()
+print("Data generated!")
 
-A = np.zeros((m, n))
-B = np.zeros((m, n))
-for i in range(0, m):
-    val_pos = np.random.normal(u_pos, co_variance, (1, n))
-    val_neg = np.random.normal(u_neg, co_variance, (1, n))
-    A[i] = val_pos
-    B[i] = val_neg
+for i in range(Y.size):
+    if Y[i, 0] == 1:
+        plt.plot(X[i, 0], X[i, 1], '-bo')
+    else:
+        plt.plot(X[i, 0], X[i, 1], '-ro')
 
-data = {1: A, -1: B}
+plt.show()
 
+# Create support vector machine
+'''
 svm = SupportVectorMachine()
 svm.train(data, n)
 svm.visualize()
+'''

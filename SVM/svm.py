@@ -17,18 +17,14 @@ class SupportVectorMachine:
         self.w = None
         self.b = None
 
-    def train(self, data: dict, n: int):
-        # clean data
-        pos_x = data.get(1)
-        neg_x = data.get(-1)
-        self.X = np.concatenate([pos_x, neg_x])
-        self.Y = np.array([])
-        for i in pos_x:
-            self.Y = np.append(self.Y, 1)
-        for i in neg_x:
-            self.Y = np.append(self.Y, -1)
-        pos_x = None  # this is just to clear up memory
-        neg_x = None  # this is just to clear up memory
+    def train(self, X, Y):
+        # get n amd m from data
+        m = X.shape[0]
+        n = X.shape[1]
+        # setup optimization variables
+        w = cp.Variable((n, 1))
+        b = cp.Variable()
+        slack = cp.Variable((n, 1))
 
         # setup optimization problem
         self.w = cp.Variable((n, 1))
