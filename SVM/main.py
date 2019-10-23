@@ -8,6 +8,7 @@ import data as d
 import random
 from svm import SupportVectorMachine
 
+
 # Generate sample data
 print("Generating training data...")
 X, Y = d.gen_data()
@@ -18,8 +19,9 @@ svm = SupportVectorMachine()
 print('\nTraining support vector machine...')
 svm.train(X, Y, 100)
 print('Training complete!')
-print("Optimal w: ", svm.w)
-print("Optimal b: ", svm.b)
+print("Optimal w:", svm.w)
+print("Optimal b:", svm.b)
+print("Chosen C:", svm.C)
 
 # Begin Test Phase
 print("\nGenerating test data...")
@@ -33,9 +35,14 @@ for i in range(0, Y2.size):
     actual = Y2[i]
     if prediction != actual:
         misclassified += 1
-print("Misclassified: ", misclassified, "/", Y2.size)
-print("Accuracy (on test data): ", (1 - (misclassified/Y2.size)) * 100, '%')
+print("Misclassified:", misclassified, "/", Y2.size)
+print("Accuracy (on test data):", (1 - (misclassified/Y2.size)) * 100, '%')
 
+# Get Info From SVM
+print('\nInfo About SVM:')
+print('Margin Length:', round(svm.getMargin(), 4))
+print("Leave One Out Error <=", 100 * round(svm.getLOOE(), 2), "%")
+print("Support Vectors ( Count =", len(svm.getSupportVectors()), "): \n", svm.getSupportVectors())
 
-print('\nPlotting results...\n')
+print('\nPlotting Decision Boundary...\n')
 svm.visualize()

@@ -4,6 +4,7 @@
 - cvxpy
 - numpy
 - matplotlib
+- random
 
 ## Question 1: SVM
 
