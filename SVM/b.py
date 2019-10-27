@@ -24,7 +24,7 @@ print("Optimal b:", svm.b)
 print("Chosen C:", svm.C)
 
 # Begin Test Phase
-print("\nGenerating test data...")
+print("\nGenerating (truly random) test data...")
 X2, Y2 = d.gen_data(random.randint(0, 999999999))
 print("Test data generated!")
 
