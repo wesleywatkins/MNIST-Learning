@@ -67,7 +67,6 @@ misclassified = 0
 for i in range(0, Y2.size):
     prediction = svm.predict(X2[i])
     actual = Y2[i]
-    print(prediction, actual)
     if prediction != actual:
         misclassified += 1
 print("Generalization Error:", round(misclassified/Y2.size, 3))
