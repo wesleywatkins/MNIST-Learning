@@ -71,4 +71,4 @@ for i in range(0, Y2.size):
         misclassified += 1
 print("Generalization Error:", round(misclassified/Y2.size, 3))
 print("Misclassified:", misclassified, "/", Y2.size)
-print("Accuracy (on test data):", (1 - (misclassified/Y2.size)) * 100, '%')
+print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
