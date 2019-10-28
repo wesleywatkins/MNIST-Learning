@@ -45,5 +45,5 @@ class LinearRegression:
         hyp_x_max = self.max_value_feature
         dec1 = hyperplane(hyp_x_min, self.w1, self.w0, 0)
         dec2 = hyperplane(hyp_x_max, self.w1, self.w0, 0)
-        plt.plot([hyp_x_min, hyp_x_max], [dec1, dec2])
+        plt.plot([hyp_x_min, hyp_x_max], [dec1, dec2], '--k')
         plt.show()
