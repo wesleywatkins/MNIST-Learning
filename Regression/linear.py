@@ -42,10 +42,8 @@ class LinearRegression:
         def hyperplane(x, w, b, v):
             return np.asscalar((-w[0] * x - b + v) / w[1])
 
-        val1 = -5
-        val2 = 5
-        hyp_x_min = -5
-        hyp_x_max = 5
+        hyp_x_min = self.min_value_feature
+        hyp_x_max = self.max_value_feature
         dec1 = hyperplane(hyp_x_min, self.w1, self.w0, 0)
         dec2 = hyperplane(hyp_x_max, self.w1, self.w0, 0)
         plt.plot([hyp_x_min, hyp_x_max], [dec1, dec2])
