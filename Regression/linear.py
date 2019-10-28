@@ -47,13 +47,3 @@ class LinearRegression:
         dec2 = hyperplane(hyp_x_max, self.w1, self.w0, 0)
         plt.plot([hyp_x_min, hyp_x_max], [dec1, dec2])
         plt.show()
-
-
-if __name__ == '__main__':
-    X = np.array([[-5, 1], [2, 2], [-3, 3], [4, 4], [-1, -1], [6, -2], [-3, -3], [-4, -4]])
-    Y = np.array([[1], [1], [1], [1], [-1], [-1], [-1], [-1]])
-    lr = LinearRegression()
-    lr.train(X, Y)
-    print(lr.predict(np.array([7, -7])))
-    print(lr.predict(np.array([7, 7])))
-    lr.visualize()
