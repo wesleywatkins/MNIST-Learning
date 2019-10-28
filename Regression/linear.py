@@ -25,7 +25,6 @@ class LinearRegression:
         loss = 1/m * cp.sum((Y - w0 - X * w1) ** 2)
         prob = cp.Problem(cp.Minimize(loss))
         prob.solve()
-        print(w0.value, w1.value)
         self.w0 = w0.value
         self.w1 = w1.value
 

@@ -8,9 +8,9 @@ print("Training data generated!")
 
 # Create support vector machine
 linear = LinearRegression()
-print('\nTraining support vector machine...')
+print('\nComputing best values for w0 and w1...')
 linear.train(X, Y)
-print('Training complete!')
+print('Computation complete!')
 
 print("\nGenerating (truly random) test data...")
 X2, Y2 = d.gen_data(random.randint(0, 999999999))
@@ -27,5 +27,5 @@ print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", (1 - (misclassified/Y2.size)) * 100, '%')
 
 # Plot the graph
-print("Plotting points and decision boundary")
+print("\nPlotting points and decision boundary")
 linear.visualize()
