@@ -76,6 +76,7 @@ logistic.train(X, Y)
 print("Logistic regression trained!")
 '''
 
+# Test SVM
 print("\nRunning SVM on test data...")
 misclassified = 0
 for i in range(0, Y2.size):
@@ -87,6 +88,7 @@ print("Generalization Error:", round(misclassified/Y2.size, 3))
 print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
 
+# Test Linear Regression
 print("\nRunning Linear Regression on test data...")
 misclassified = 0
 for i in range(0, Y2.size):
@@ -99,6 +101,7 @@ print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
 
 '''
+# Test Logistic Regression
 print("\nRunning Logistic Regression on test data...")
 misclassified = 0
 for i in range(0, Y2.size):

@@ -17,6 +17,7 @@ class SupportVectorMachine:
         self.w = None
         self.b = None
         self.C = None
+        # These will be useful for plotting
         self.min_data_point = None
         self.max_data_point = None
 
@@ -48,6 +49,7 @@ class SupportVectorMachine:
         w_vals = []
         b_vals = []
         train_error = np.zeros(trials)
+        # try out a bunch of different C values to find the best one
         for i in range(trials):
             C.value = C_vals[i]
             prob.solve()
@@ -67,6 +69,7 @@ class SupportVectorMachine:
                 self.b = b_vals[i]
                 self.C = C_vals[i]
 
+    # predict + or - for a set of features
     def predict(self, features):
         if self.w is not None and self.b is not None:
             return np.sign(np.dot(np.array(features), self.w) + self.b)
@@ -96,9 +99,11 @@ class SupportVectorMachine:
         plt.plot(nsv[0], nsv[1], 'r')
         plt.show()
 
+    # LOOE <= SV/m
     def getLOOE(self):
         return len(self.getSupportVectors()) / self.Y.size
 
+    # Return a list of support vectors from the given training data
     def getSupportVectors(self):
         support_vectors = list()
         close_enough = 0.05  # this is to handle floating precision errors
@@ -106,6 +111,7 @@ class SupportVectorMachine:
             val = abs((np.dot(np.array(self.X[i]), self.w) + self.b))
             if 1 - close_enough <= val <= 1 + close_enough:
                 support_vectors.append(self.X[i].tolist())
+            # I think this is uncessary bc of the "abs" but I don't have time to remove it and test
             if -1 - close_enough <= val <= -1 + close_enough:
                 support_vectors.append(self.X[i].tolist())
         return support_vectors
@@ -118,6 +124,7 @@ class SupportVectorMachine:
         slope = (points[1][1] - points[0][1]) / (points[1][0] - points[0][0])
         return abs(c1 - c2) / (slope ** 2 + 1) ** 0.5
 
+    # Get two points from drawing decision boundary line
     def getDecBound(self):
         hyp_x_min = self.min_data_point * 0.9
         hyp_x_max = self.max_data_point * 1.1
@@ -125,6 +132,7 @@ class SupportVectorMachine:
         dec2 = self.hyperplane(hyp_x_max, self.w, self.b, 0)
         return [hyp_x_min, hyp_x_max], [dec1, dec2]
 
+    # Get two points for drawing positive support vector line
     def getPosSupVec(self):
         hyp_x_min = self.min_data_point * 0.9
         hyp_x_max = self.max_data_point * 1.1
@@ -132,6 +140,7 @@ class SupportVectorMachine:
         psv2 = self.hyperplane(hyp_x_max, self.w, self.b, 1)
         return [hyp_x_min, hyp_x_max], [psv1, psv2]
 
+    # Get two points for drawing negative support vector line
     def getNegSupVec(self):
         hyp_x_min = self.min_data_point * 0.9
         hyp_x_max = self.max_data_point * 1.1
@@ -139,5 +148,7 @@ class SupportVectorMachine:
         nsv2 = self.hyperplane(hyp_x_max, self.w, self.b, -1)
         return [hyp_x_min, hyp_x_max], [nsv1, nsv2]
 
+    # given a value of v, returns value from hyperplane
+    # formula from https://www.youtube.com/watch?v=yrnhziJk-z8&t=323s
     def hyperplane(self, x, w, b, v):
         return np.asscalar((-w[0] * x - b + v) / w[1])

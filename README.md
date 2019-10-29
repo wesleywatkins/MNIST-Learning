@@ -18,3 +18,14 @@ All the questions are answered at the bottom of the code.
 ### Part C
 The file "/SVM/c.py" answers this question. The generalization error is as follows:
 - Oops
+
+## Question 2: Regression
+
+### Part A
+The file "/Regression/linear.py" implements a linear regression model. The model is then trained and tested in the file "/Regression/a.py"
+
+### Part B
+The file "/Regression/logistic.py" implements a logistic regression model. The model is then trained and tested in the file "/Regression/b.py"
+
+### Part C
+The file "/Regression/c.py" uses the MNIST dataset and compares the test error between the linear regression model, the logistic regression model, and the SVM model.

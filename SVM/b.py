@@ -2,8 +2,6 @@
 # wjw16
 
 # Import and Initializations
-import numpy as np
-import matplotlib.pyplot as plt
 import data as d
 import random
 from svm import SupportVectorMachine
