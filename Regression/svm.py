@@ -17,57 +17,42 @@ class SupportVectorMachine:
         self.w = None
         self.b = None
         self.C = None
-        # These will be useful for plotting
-        self.min_data_point = None
-        self.max_data_point = None
+        self.w_vals = None
+        self.b_vals = None
+        self.C_vals = None
 
     def train(self, X, Y, trials):
-        # set X and Y variables
-        self.X = X
-        self.Y = Y
-
-        # get n amd m from data
-        m = X.shape[0]
-        n = X.shape[1]
-
-        # get max and min (this will be useful later)
-        self.min_data_point = np.min(X)
-        self.max_data_point = np.max(X)
-
+        # set info from data
+        self.X, self.Y = X, Y
+        m, n = X.shape[0], X.shape[1]
         # setup optimization variables
         w = cp.Variable((n, 1))
         b = cp.Variable()
         C = cp.Parameter(nonneg=True)
-
         # setup optimization problem
         loss = cp.sum(cp.pos(1 - cp.multiply(Y, X * w - b)))
         reg = 0.5 * cp.norm(w, 2)
         prob = cp.Problem(cp.Minimize(reg + C * loss))
         C_vals = np.logspace(-2, 0, trials)
-
-        # solve
-        w_vals = []
-        b_vals = []
-        train_error = np.zeros(trials)
+        w_vals, b_vals = [], []
+        min_error, min_error_i = 1, 0
         # try out a bunch of different C values to find the best one
         for i in range(trials):
             C.value = C_vals[i]
             prob.solve()
-            train_error[i] = (self.Y != np.sign(X.dot(w.value) - b.value)).sum() / m
+            train_error = (self.Y != np.sign(X.dot(w.value) - b.value)).sum() / m
+            if train_error < min_error:
+                min_error, min_error_i = train_error, i
             w_vals.append(w.value)
             b_vals.append(b.value)
-
         # find smallest error
-        min_error = train_error[0]
-        self.w = w_vals[0]
-        self.b = b_vals[0]
-        self.C = C_vals[0]
-        for (i, error) in enumerate(train_error):
-            if error < min_error:
-                min_error = error
-                self.w = w_vals[i]
-                self.b = b_vals[i]
-                self.C = C_vals[i]
+        self.w = w_vals[min_error_i]
+        self.b = b_vals[min_error_i]
+        self.C = C_vals[min_error_i]
+        # store all values
+        self.w_vals = w_vals
+        self.b_vals = b_vals
+        self.C_vals = C_vals
 
     # predict + or - for a set of features
     def predict(self, features):
@@ -76,11 +61,94 @@ class SupportVectorMachine:
         else:
             return 0
 
+    # get test error on test data
+    def test(self, X, Y, diff_Cs=False):
+        if not diff_Cs:
+            misclassified = 0
+            for i in range(0, Y.size):
+                prediction, actual = self.predict(X[i]).item(), Y[i].item()
+                if prediction != actual:
+                    misclassified += 1
+            return misclassified
+        else:
+            best_w, best_b, best_C = self.w, self.b, self.C
+            if len(self.C_vals) >= 5:
+                random_indexes = np.random.choice(len(self.C_vals), 5, replace=False)
+            else:
+                random_indexes = range(0, len(self.C_vals))
+            errors = np.zeros((len(random_indexes), 2))
+            for (j, i) in enumerate(random_indexes):
+                self.w = self.w_vals[i]
+                self.b = self.b_vals[i]
+                misclassified = 0
+                for k in range(0, Y.size):
+                    prediction, actual = self.predict(X[k]), Y[k]
+                    if prediction != actual:
+                        misclassified += 1
+                errors[j][0] = self.C_vals[i]
+                errors[j][1] = misclassified
+            self.w, self.b, self.C = best_w, best_b, best_C
+            return errors
+
+    # Return a list of support vectors from the given training data
+    def getSupportVectors(self):
+        support_vectors = list()
+        close_enough = 0.01  # this is to handle floating precision errors
+        for i in range(self.Y.size):
+            val = abs((np.dot(np.array(self.X[i]), self.w) + self.b))
+            if 1 - close_enough <= val <= 1 + close_enough:
+                support_vectors.append(self.X[i].tolist())
+        return support_vectors
+
+    # Formula from: https://www.toppr.com/guides/maths/straight-lines/distance-of-point-from-a-line/
+    def getMargin(self, diff_Cs=False):
+        if not diff_Cs:
+            c1 = self.hyperplane(0, self.w, self.b, 1)
+            c2 = self.hyperplane(0, self.w, self.b, 0)
+            points = self.getDecBound()
+            slope = (points[1][1] - points[0][1]) / (points[1][0] - points[0][0])
+            return abs(c1 - c2) / (slope ** 2 + 1) ** 0.5
+        else:
+            best_w, best_b, best_C = self.w, self.b, self.C
+            if len(self.C_vals) >= 5:
+                random_indexes = np.random.choice(len(self.C_vals), 5, replace=False)
+            else:
+                random_indexes = range(0, len(self.C_vals))
+            margins = np.zeros((len(random_indexes), 2))
+            for (j, i) in enumerate(random_indexes):
+                self.w = self.w_vals[i]
+                self.b = self.b_vals[i]
+                c1 = self.hyperplane(0, self.w, self.b, 1)
+                c2 = self.hyperplane(0, self.w, self.b, 0)
+                points = self.getDecBound()
+                slope = (points[1][1] - points[0][1]) / (points[1][0] - points[0][0])
+                margins[j][0] = self.C_vals[i]
+                margins[j][1] = abs(c1 - c2) / (slope ** 2 + 1) ** 0.5
+            self.w, self.b, self.C = best_w, best_b, best_C
+            return margins
+
+    # LOOE <= SV / m+1
+    def getLOOE(self):
+        return len(self.getSupportVectors()) / (self.Y.size + 1)
+
+    # Get two points from drawing decision boundary line
+    def getDecBound(self):
+        x_min = np.min(self.X) * 0.9
+        x_max = np.max(self.X) * 1.1
+        dec1 = self.hyperplane(x_min, self.w, self.b, 0)
+        dec2 = self.hyperplane(x_max, self.w, self.b, 0)
+        return [x_min, x_max], [dec1, dec2]
+
+    # given a value of v, returns value from hyperplane
+    # formula from https://www.youtube.com/watch?v=yrnhziJk-z8&t=323s
+    def hyperplane(self, x, w, b, v):
+        return np.asscalar((-w[0] * x - b + v) / w[1])
+
     # Got help from the following YouTube video
     # when it came to plotting the hyperplane
     # and support vectors
     # https://www.youtube.com/watch?v=yrnhziJk-z8&t=323s
-    def visualize(self):
+    def visualize(self, diff_Cs=False):
         # print data points
         for i in range(0, self.Y.size):
             if self.Y[i] == 1:
@@ -88,67 +156,29 @@ class SupportVectorMachine:
             if self.Y[i] == -1:
                 plt.plot(self.X[i, 0], self.X[i, 1], 'ro')
 
-        # get decision boundary and support vectors
-        dec = self.getDecBound()
-        psv = self.getPosSupVec()
-        nsv = self.getNegSupVec()
+        # plot decision boundary
+        if not diff_Cs:
+            dec = self.getDecBound()
+            plt.plot(dec[0], dec[1], 'k', label="Decision Boundary")
+            plt.legend()
 
-        # plot data
-        plt.plot(dec[0], dec[1], 'k--')
-        plt.plot(psv[0], psv[1], 'b')
-        plt.plot(nsv[0], nsv[1], 'r')
+        # plot decision boundary for different values of C
+        else:
+            best_w = self.w
+            best_b = self.b
+            best_C = self.C
+            if len(self.C_vals) >= 5:
+                random_indexes = np.random.choice(len(self.C_vals), 5, replace=False)
+            else:
+                random_indexes = range(0, len(self.C_vals))
+            for i in random_indexes:
+                self.w = self.w_vals[i]
+                self.b = self.b_vals[i]
+                dec = self.getDecBound()
+                plt.plot(dec[0], dec[1], c=np.random.rand(3, ), label=str(round(self.C_vals[i], 3)))
+            self.w = best_w
+            self.b = best_b
+            self.C = best_C
+            plt.legend()
+
         plt.show()
-
-    # LOOE <= SV/m
-    def getLOOE(self):
-        return len(self.getSupportVectors()) / self.Y.size
-
-    # Return a list of support vectors from the given training data
-    def getSupportVectors(self):
-        support_vectors = list()
-        close_enough = 0.05  # this is to handle floating precision errors
-        for i in range(self.Y.size):
-            val = abs((np.dot(np.array(self.X[i]), self.w) + self.b))
-            if 1 - close_enough <= val <= 1 + close_enough:
-                support_vectors.append(self.X[i].tolist())
-            # I think this is uncessary bc of the "abs" but I don't have time to remove it and test
-            if -1 - close_enough <= val <= -1 + close_enough:
-                support_vectors.append(self.X[i].tolist())
-        return support_vectors
-
-    # Formula from: https://www.toppr.com/guides/maths/straight-lines/distance-of-point-from-a-line/
-    def getMargin(self):
-        c1 = self.hyperplane(0, self.w, self.b, 1)
-        c2 = self.hyperplane(0, self.w, self.b, 0)
-        points = self.getDecBound()
-        slope = (points[1][1] - points[0][1]) / (points[1][0] - points[0][0])
-        return abs(c1 - c2) / (slope ** 2 + 1) ** 0.5
-
-    # Get two points from drawing decision boundary line
-    def getDecBound(self):
-        hyp_x_min = self.min_data_point * 0.9
-        hyp_x_max = self.max_data_point * 1.1
-        dec1 = self.hyperplane(hyp_x_min, self.w, self.b, 0)
-        dec2 = self.hyperplane(hyp_x_max, self.w, self.b, 0)
-        return [hyp_x_min, hyp_x_max], [dec1, dec2]
-
-    # Get two points for drawing positive support vector line
-    def getPosSupVec(self):
-        hyp_x_min = self.min_data_point * 0.9
-        hyp_x_max = self.max_data_point * 1.1
-        psv1 = self.hyperplane(hyp_x_min, self.w, self.b, 1)
-        psv2 = self.hyperplane(hyp_x_max, self.w, self.b, 1)
-        return [hyp_x_min, hyp_x_max], [psv1, psv2]
-
-    # Get two points for drawing negative support vector line
-    def getNegSupVec(self):
-        hyp_x_min = self.min_data_point * 0.9
-        hyp_x_max = self.max_data_point * 1.1
-        nsv1 = self.hyperplane(hyp_x_min, self.w, self.b, -1)
-        nsv2 = self.hyperplane(hyp_x_max, self.w, self.b, -1)
-        return [hyp_x_min, hyp_x_max], [nsv1, nsv2]
-
-    # given a value of v, returns value from hyperplane
-    # formula from https://www.youtube.com/watch?v=yrnhziJk-z8&t=323s
-    def hyperplane(self, x, w, b, v):
-        return np.asscalar((-w[0] * x - b + v) / w[1])

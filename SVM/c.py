@@ -63,12 +63,7 @@ svm.train(X, Y, 1)
 print("SVM trained!")
 
 print("\nRunning test data...")
-misclassified = 0
-for i in range(0, Y2.size):
-    prediction = svm.predict(X2[i])
-    actual = Y2[i]
-    if prediction != actual:
-        misclassified += 1
+misclassified = svm.test(X2, Y2)
 print("Generalization Error:", round(misclassified/Y2.size, 3))
 print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')

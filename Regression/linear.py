@@ -16,18 +16,9 @@ class LinearRegression:
         self.Y = None
         self.w0 = None
         self.w1 = None
-        # useful for plotting
-        self.min_value_feature = None
-        self.max_value_feature = None
 
     # Training using cvxpy to find optimal w0 and w1
     def train(self, X, Y):
-        # store data
-        self.X = X
-        self.Y = Y
-        # store min and max for plotting later
-        self.min_value_feature = np.min(X)
-        self.max_value_feature = np.max(X)
         # get sample and feature size
         m = X.shape[0]
         n = X.shape[1]
@@ -39,15 +30,24 @@ class LinearRegression:
         prob = cp.Problem(cp.Minimize(loss))
         prob.solve()
         # store values
+        self.X = X
+        self.Y = Y
         self.w0 = w0.value
         self.w1 = w1.value
 
     # predict + or - based off sign of w0 + w1*X
     def predict(self, features):
-        return np.sign(self.w0 + np.dot(features, self.w1))
+        if self.w0 is not None and self.w1 is not None:
+            return np.sign(self.w0 + np.dot(features, self.w1))
+        else:
+            return 0
 
     # plot points and decision boundary
     def visualize(self):
+        # skip if not trained
+        if self.X is None or self.Y is None or self.w0 is None or self.w1 is None:
+            return None
+
         # plot training points
         for i in range(0, self.Y.size):
             if self.Y[i] == 1:
@@ -61,9 +61,9 @@ class LinearRegression:
             return np.asscalar((-w[0] * x - b + v) / w[1])
 
         # Get two points for drawing decision boundary
-        hyp_x_min = self.min_value_feature
-        hyp_x_max = self.max_value_feature
-        dec1 = hyperplane(hyp_x_min, self.w1, self.w0, 0)
-        dec2 = hyperplane(hyp_x_max, self.w1, self.w0, 0)
-        plt.plot([hyp_x_min, hyp_x_max], [dec1, dec2], '--k')
+        x_min = np.min(self.X)
+        x_max = np.max(self.X)
+        dec1 = hyperplane(x_min, self.w1, self.w0, 0)
+        dec2 = hyperplane(x_max, self.w1, self.w0, 0)
+        plt.plot([x_min, x_max], [dec1, dec2], '--k')
         plt.show()
