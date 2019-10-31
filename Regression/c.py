@@ -69,12 +69,10 @@ linear = LinearRegression()
 linear.train(X, Y)
 print("Linear regression trained!")
 
-'''
 print("\nTraining Logistic Regression on MNIST dataset...")
 logistic = LogisticRegression()
 logistic.train(X, Y)
 print("Logistic regression trained!")
-'''
 
 # Test SVM
 print("\nRunning SVM on test data...")
@@ -100,7 +98,7 @@ print("Generalization Error:", round(misclassified/Y2.size, 3))
 print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
 
-'''
+
 # Test Logistic Regression
 print("\nRunning Logistic Regression on test data...")
 misclassified = 0
@@ -112,4 +110,4 @@ for i in range(0, Y2.size):
 print("Generalization Error:", round(misclassified/Y2.size, 3))
 print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
-'''
+

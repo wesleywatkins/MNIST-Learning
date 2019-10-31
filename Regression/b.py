@@ -8,7 +8,7 @@ print("Training data generated!")
 
 # Create support vector machine
 logistic = LogisticRegression()
-print('\nComputing best values for w0 and w1...')
+print('\nComputing best value for w...')
 logistic.train(X, Y)
 print('Computation complete!')
 
@@ -28,4 +28,4 @@ print("Accuracy (on test data):", (1 - (misclassified/Y2.size)) * 100, '%')
 
 # Plot the graph
 print("\nPlotting points and decision boundary")
-# logistic.visualize()
+logistic.visualize()
