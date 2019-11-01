@@ -36,7 +36,6 @@ print('\nInfo About SVM:')
 print('Margin Length:', round(svm.getMargin(), 4))
 print("Leave One Out Error <=", 100 * round(svm.getLOOE(), 2), "%")
 sv = svm.getSupportVectors()
-np.set_printoptions(precision=3)
 print("Support Vectors ( Count =", len(sv), "):")
 for row in sv:
     print("(" + str(round(row[0], 7)) + ", " + str(round(row[1], 7)) + ")")
@@ -48,7 +47,7 @@ print("Test data generated!")
 
 # Testing different values of C
 print("\nMisclassification error with different values of C...")
-values = svm.test(X2, Y2, diff_Cs=True)
+values = svm.testVariety(X2, Y2)
 for i in range(values.shape[0]):
     values[i, 1] = round(values[i, 1]/Y2.size * 100, 4)
 df = pd.DataFrame(values, columns=list(["C", "Error %"]))
@@ -56,10 +55,10 @@ print(df)
 
 # Testing different values of C
 print("\nMargin with different values of C...")
-values = svm.getMargin(diff_Cs=True)
+values = svm.getMarginVariety()
 df = pd.DataFrame(values, columns=list(["C", "Margin"]))
 print(df)
 
 print('\nPlotting Decision Boundary for different values of C...')
 print("Plotted!")
-svm.visualize(diff_Cs=True)
+svm.visualizeVariety()

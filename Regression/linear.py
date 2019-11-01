@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 # Class for linear regression model
 class LinearRegression:
 
-    # Initialize all variables to zero
+    # Initialize all variables to none
     def __init__(self):
         self.X = None
         self.Y = None
@@ -34,6 +34,37 @@ class LinearRegression:
         self.Y = Y
         self.w0 = w0.value
         self.w1 = w1.value
+
+    # test model on given test data
+    def test(self, X, Y):
+        # skip if not trained
+        if self.X is None or self.Y is None or self.w0 is None or self.w1 is None:
+            return None
+        # calculate # of misclassified points
+        # in given test data
+        misclassified = 0
+        for i in range(0, Y.size):
+            prediction = self.predict(X[i])
+            actual = Y[i]
+            if prediction != actual:
+                misclassified += 1
+        return misclassified
+
+    def getLOOE(self):
+        if self.X is None or self.Y is None:
+            return None
+        errors = []
+        for i in range(self.Y.size):
+            temp_X = np.copy(self.X)
+            temp_Y = np.copy(self.Y)
+            temp_X = np.delete(temp_X, i, 0)
+            temp_Y = np.delete(temp_Y, i, 0)
+            error = self.test(temp_X, temp_Y)
+            errors.append(error/temp_Y.size)
+        sum = 0
+        for e in errors:
+            sum += e
+        return sum / len(errors)
 
     # predict + or - based off sign of w0 + w1*X
     def predict(self, features):

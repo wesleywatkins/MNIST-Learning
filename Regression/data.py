@@ -13,12 +13,12 @@ def gen_data(seed=19719):
     ])
 
     # generate pos and neg points
-    np.random.seed(seed)
+    r = np.random.RandomState(seed)
     A = np.zeros((m, n))  # + features
     B = np.zeros((m, n))  # - features
     for i in range(0, m):
-        A[i] = np.random.multivariate_normal(mu_pos, covariance)
-        B[i] = np.random.multivariate_normal(mu_neg, covariance)
+        A[i] = r.multivariate_normal(mu_pos, covariance)
+        B[i] = r.multivariate_normal(mu_neg, covariance)
 
     # get X and Y values
     X = np.concatenate([A, B])  # concatenate + and - features

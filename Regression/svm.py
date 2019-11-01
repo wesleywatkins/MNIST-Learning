@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 # create SVM class
 class SupportVectorMachine:
 
+    # initialize all variables to none
     def __init__(self):
-        # initialize all variables to none
         self.X = None
         self.Y = None
         self.w = None
@@ -21,6 +21,8 @@ class SupportVectorMachine:
         self.b_vals = None
         self.C_vals = None
 
+    # train svm on given training data
+    # also store the training data for plotting later
     def train(self, X, Y, trials):
         # set info from data
         self.X, self.Y = X, Y
@@ -61,34 +63,36 @@ class SupportVectorMachine:
         else:
             return 0
 
-    # get test error on test data
-    def test(self, X, Y, diff_Cs=False):
-        if not diff_Cs:
+    # get test error on given test data
+    def test(self, X, Y):
+        misclassified = 0
+        for i in range(0, Y.size):
+            prediction, actual = self.predict(X[i]).item(), Y[i].item()
+            if prediction != actual:
+                misclassified += 1
+        return misclassified
+
+    # get test error on given test data
+    # for a variety of different C values
+    def testVariety(self, X, Y):
+        best_w, best_b, best_C = self.w, self.b, self.C
+        if len(self.C_vals) >= 5:
+            random_indexes = np.random.choice(len(self.C_vals), 5, replace=False)
+        else:
+            random_indexes = range(0, len(self.C_vals))
+        errors = np.zeros((len(random_indexes), 2))
+        for (j, i) in enumerate(random_indexes):
+            self.w = self.w_vals[i]
+            self.b = self.b_vals[i]
             misclassified = 0
-            for i in range(0, Y.size):
-                prediction, actual = self.predict(X[i]).item(), Y[i].item()
+            for k in range(0, Y.size):
+                prediction, actual = self.predict(X[k]), Y[k]
                 if prediction != actual:
                     misclassified += 1
-            return misclassified
-        else:
-            best_w, best_b, best_C = self.w, self.b, self.C
-            if len(self.C_vals) >= 5:
-                random_indexes = np.random.choice(len(self.C_vals), 5, replace=False)
-            else:
-                random_indexes = range(0, len(self.C_vals))
-            errors = np.zeros((len(random_indexes), 2))
-            for (j, i) in enumerate(random_indexes):
-                self.w = self.w_vals[i]
-                self.b = self.b_vals[i]
-                misclassified = 0
-                for k in range(0, Y.size):
-                    prediction, actual = self.predict(X[k]), Y[k]
-                    if prediction != actual:
-                        misclassified += 1
-                errors[j][0] = self.C_vals[i]
-                errors[j][1] = misclassified
-            self.w, self.b, self.C = best_w, best_b, best_C
-            return errors
+            errors[j][0] = self.C_vals[i]
+            errors[j][1] = misclassified
+        self.w, self.b, self.C = best_w, best_b, best_C
+        return errors
 
     # Return a list of support vectors from the given training data
     def getSupportVectors(self):
@@ -101,31 +105,31 @@ class SupportVectorMachine:
         return support_vectors
 
     # Formula from: https://www.toppr.com/guides/maths/straight-lines/distance-of-point-from-a-line/
-    def getMargin(self, diff_Cs=False):
-        if not diff_Cs:
+    def getMargin(self):
+        c1 = self.hyperplane(0, self.w, self.b, 1)
+        c2 = self.hyperplane(0, self.w, self.b, 0)
+        points = self.getDecBound()
+        slope = (points[1][1] - points[0][1]) / (points[1][0] - points[0][0])
+        return abs(c1 - c2) / (slope ** 2 + 1) ** 0.5
+
+    def getMarginVariety(self):
+        best_w, best_b, best_C = self.w, self.b, self.C
+        if len(self.C_vals) >= 5:
+            random_indexes = np.random.choice(len(self.C_vals), 5, replace=False)
+        else:
+            random_indexes = range(0, len(self.C_vals))
+        margins = np.zeros((len(random_indexes), 2))
+        for (j, i) in enumerate(random_indexes):
+            self.w = self.w_vals[i]
+            self.b = self.b_vals[i]
             c1 = self.hyperplane(0, self.w, self.b, 1)
             c2 = self.hyperplane(0, self.w, self.b, 0)
             points = self.getDecBound()
             slope = (points[1][1] - points[0][1]) / (points[1][0] - points[0][0])
-            return abs(c1 - c2) / (slope ** 2 + 1) ** 0.5
-        else:
-            best_w, best_b, best_C = self.w, self.b, self.C
-            if len(self.C_vals) >= 5:
-                random_indexes = np.random.choice(len(self.C_vals), 5, replace=False)
-            else:
-                random_indexes = range(0, len(self.C_vals))
-            margins = np.zeros((len(random_indexes), 2))
-            for (j, i) in enumerate(random_indexes):
-                self.w = self.w_vals[i]
-                self.b = self.b_vals[i]
-                c1 = self.hyperplane(0, self.w, self.b, 1)
-                c2 = self.hyperplane(0, self.w, self.b, 0)
-                points = self.getDecBound()
-                slope = (points[1][1] - points[0][1]) / (points[1][0] - points[0][0])
-                margins[j][0] = self.C_vals[i]
-                margins[j][1] = abs(c1 - c2) / (slope ** 2 + 1) ** 0.5
-            self.w, self.b, self.C = best_w, best_b, best_C
-            return margins
+            margins[j][0] = self.C_vals[i]
+            margins[j][1] = abs(c1 - c2) / (slope ** 2 + 1) ** 0.5
+        self.w, self.b, self.C = best_w, best_b, best_C
+        return margins
 
     # LOOE <= SV / m+1
     def getLOOE(self):
@@ -146,39 +150,44 @@ class SupportVectorMachine:
 
     # Got help from the following YouTube video
     # when it came to plotting the hyperplane
-    # and support vectors
     # https://www.youtube.com/watch?v=yrnhziJk-z8&t=323s
-    def visualize(self, diff_Cs=False):
+    def visualize(self):
         # print data points
         for i in range(0, self.Y.size):
             if self.Y[i] == 1:
                 plt.plot(self.X[i, 0], self.X[i, 1], 'bo')
             if self.Y[i] == -1:
                 plt.plot(self.X[i, 0], self.X[i, 1], 'ro')
+        # draw decision boundary
+        dec = self.getDecBound()
+        plt.plot(dec[0], dec[1], 'k', label="Decision Boundary")
+        plt.legend()
+        plt.show()
 
-        # plot decision boundary
-        if not diff_Cs:
-            dec = self.getDecBound()
-            plt.plot(dec[0], dec[1], 'k', label="Decision Boundary")
-            plt.legend()
-
-        # plot decision boundary for different values of C
+    # draw training points and decision boundary
+    # for different values of C
+    def visualizeVariety(self):
+        # print data points
+        for i in range(0, self.Y.size):
+            if self.Y[i] == 1:
+                plt.plot(self.X[i, 0], self.X[i, 1], 'bo')
+            if self.Y[i] == -1:
+                plt.plot(self.X[i, 0], self.X[i, 1], 'ro')
+        # draw decision boundary for different values of C
+        best_w = self.w
+        best_b = self.b
+        best_C = self.C
+        if len(self.C_vals) >= 5:
+            random_indexes = np.random.choice(len(self.C_vals), 5, replace=False)
         else:
-            best_w = self.w
-            best_b = self.b
-            best_C = self.C
-            if len(self.C_vals) >= 5:
-                random_indexes = np.random.choice(len(self.C_vals), 5, replace=False)
-            else:
-                random_indexes = range(0, len(self.C_vals))
-            for i in random_indexes:
-                self.w = self.w_vals[i]
-                self.b = self.b_vals[i]
-                dec = self.getDecBound()
-                plt.plot(dec[0], dec[1], c=np.random.rand(3, ), label=str(round(self.C_vals[i], 3)))
-            self.w = best_w
-            self.b = best_b
-            self.C = best_C
-            plt.legend()
-
+            random_indexes = range(0, len(self.C_vals))
+        for i in random_indexes:
+            self.w = self.w_vals[i]
+            self.b = self.b_vals[i]
+            dec = self.getDecBound()
+            plt.plot(dec[0], dec[1], c=np.random.rand(3, ), label=str(round(self.C_vals[i], 3)))
+        self.w = best_w
+        self.b = best_b
+        self.C = best_C
+        plt.legend()
         plt.show()
