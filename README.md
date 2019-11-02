@@ -14,18 +14,12 @@
 - The seed for test data created in "./data.py" is 10430 (honestly, just random)
 
 ## Files
-- ./data.py : generate data as specified in project description
-- ./SVM/svm.py : creates an Support Vector Machine model
-- ./SVM/b.py : trains SVM with data generated from "./data.py", plots/displays decision boundary, computes and prints
-margin length, support vectors, cross-validation error, and various margin lengths and misclassification errors for
-different values of C, and finally plots decision boundaries for different values of C
-- ./SVM/c.py : reads in MNIST training and test data sets, trains SVM on training data, then computes generalization
-error on test data
-- ./Regression/linear.py : creates a linear regression model
-- ./Regression/logistic.py : creates a logistic regression model
-- ./Regression/a.py : trains linear model with data generated from "./data.py", calculates generalization error on
-test data generated in the same manner, computes the leave one out validation error, and plots the decision boundary
-- ./Regression/b.py : trains logistic model with data generated from "./data.py", calculates generalization error on
-test data generated in the same manner, computes the leave one out validation error, and plots the decision boundary
-- ./Regression/c.py : reads in MNIST training and test data sets, trains SVM, linear, and logistic regression models on
-training data, then computes generalization error on test data for each model
+- **./data.py** : generate data as specified in project description
+- **./SVM/svm.py** : creates an Support Vector Machine model class
+- **./SVM/b.py** : trains SVM with data generated from "./data.py", plots/displays decision boundary, computes and prints margin length, support vectors, cross-validation error, and various margin lengths and misclassification errors for different values of C, and finally plots decision boundaries for different values of C
+- **./SVM/c.py** : reads in MNIST training and test data sets, trains SVM on training data, then computes generalization error on test data
+- **./Regression/linear.py** : creates a linear regression model class
+- **./Regression/logistic.py** : creates a logistic regression model class
+- **./Regression/a.py** : trains linear model with data generated from "./data.py", calculates generalization error on test data generated in the same manner, computes the leave one out validation error, and plots the decision boundary
+- **./Regression/b.py** : trains logistic model with data generated from "./data.py", calculates generalization error on test data generated in the same manner, computes the leave one out validation error, and plots the decision boundary
+- **./Regression/c.py** : reads in MNIST training and test data sets, trains SVM, linear, and logistic regression models on training data, then computes generalization error on test data for each model
