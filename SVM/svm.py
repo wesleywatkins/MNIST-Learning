@@ -24,7 +24,7 @@ class SupportVectorMachine:
 
     # train svm on given training data
     # also store the training data for plotting later
-    def train(self, X, Y, trials, store_data=True):
+    def train(self, X, Y, trials=1, store_data=True):
         # set info from data
         if store_data:
             self.X, self.Y, self.trials = X, Y, trials
