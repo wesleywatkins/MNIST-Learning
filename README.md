@@ -1,31 +1,31 @@
 # CIS4930-PA1
 
 ## Libraries Used
-- cvxpy
-- numpy
-- matplotlib
-- pandas
+- cvxpy (for convex optimization problem)
+- matplotlib (for plotting results)
+- pandas (for printing arrays all pretty-like)
+- mlxtend (for reading in MNIST dataset)
+- numpy (for obvious reasons)
 
-## Question 1: SVM
+## How To Run Files
+- Install the dependencies listed above
+- Any files labeled "a.py", "b.py", and "c.py" can each be ran directly
+- The seed for training data created in "./data.py" is 19719 (last 5 of my lib card #)
+- The seed for test data created in "./data.py" is 10430 (honestly, just random)
 
-### Part A
-The file "/SVM/svm.py" creates a Support Vector Machine class that implements the soft margin SVM classification algorithm.
-
-### Part B
-The file "/SVM/b.py" answers the question. 200 positively labeled points are generated, and 200 negatively labeled points are generated. Then, the SVM class created for Part A is trained on the data, and then the visualize function is called to plot the data and the decision boundary.
-All the questions are answered at the bottom of the code.
-
-### Part C
-The file "/SVM/c.py" answers this question. The generalization error is as follows:
-- Oops
-
-## Question 2: Regression
-
-### Part A
-The file "/Regression/linear.py" implements a linear regression model. The model is then trained and tested in the file "/Regression/a.py"
-
-### Part B
-The file "/Regression/logistic.py" implements a logistic regression model. The model is then trained and tested in the file "/Regression/b.py"
-
-### Part C
-The file "/Regression/c.py" uses the MNIST dataset and compares the test error between the linear regression model, the logistic regression model, and the SVM model.
+## Files
+- ./data.py : generate data as specified in project description
+- ./SVM/svm.py : creates an Support Vector Machine model
+- ./SVM/b.py : trains SVM with data generated from "./data.py", plots/displays decision boundary, computes and prints
+margin length, support vectors, cross-validation error, and various margin lengths and misclassification errors for
+different values of C, and finally plots decision boundaries for different values of C
+- ./SVM/c.py : reads in MNIST training and test data sets, trains SVM on training data, then computes generalization
+error on test data
+- ./Regression/linear.py : creates a linear regression model
+- ./Regression/logistic.py : creates a logistic regression model
+- ./Regression/a.py : trains linear model with data generated from "./data.py", calculates generalization error on
+test data generated in the same manner, computes the leave one out validation error, and plots the decision boundary
+- ./Regression/b.py : trains logistic model with data generated from "./data.py", calculates generalization error on
+test data generated in the same manner, computes the leave one out validation error, and plots the decision boundary
+- ./Regression/c.py : reads in MNIST training and test data sets, trains SVM, linear, and logistic regression models on
+training data, then computes generalization error on test data for each model
