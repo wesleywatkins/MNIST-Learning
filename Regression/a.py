@@ -1,8 +1,12 @@
-import data as d
-import random
+# import linear regression model
 from linear import LinearRegression
 
-print("Generating training data...")
+# import data generator
+import sys
+sys.path.append("..")  # Adds higher directory to python modules path.
+import data as d
+
+print("\nGenerating training data...")
 X, Y = d.gen_data()
 print("Training data generated!")
 
@@ -12,7 +16,7 @@ print('\nComputing best values for w0 and w1...')
 linear.train(X, Y)
 print('Computation complete!')
 
-print("\nGenerating (truly random) test data...")
+print("\nGenerating test data...")
 X2, Y2 = d.gen_data(10430)
 print("Test data generated!")
 
@@ -20,8 +24,11 @@ print("Test data generated!")
 misclassified = linear.test(X2, Y2)
 print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", (1 - (misclassified/Y2.size)) * 100, '%')
-print("Leave One Out Error =", round(linear.getLOOE(), 4))
+
+# Compute leave one out error
+print("\nComputing leave one out cross validation error...")
+print("Leave one out error =", round(linear.getLOOE(), 4))
 
 # Plot the graph
-print("\nPlotting points and decision boundary")
+print("\nPlotting points and decision boundary...")
 linear.visualize()

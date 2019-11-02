@@ -18,7 +18,7 @@ class LinearRegression:
         self.w1 = None
 
     # Training using cvxpy to find optimal w0 and w1
-    def train(self, X, Y):
+    def train(self, X, Y, store_data=True):
         # get sample and feature size
         m = X.shape[0]
         n = X.shape[1]
@@ -30,10 +30,11 @@ class LinearRegression:
         prob = cp.Problem(cp.Minimize(loss))
         prob.solve()
         # store values
-        self.X = X
-        self.Y = Y
         self.w0 = w0.value
         self.w1 = w1.value
+        if store_data:
+            self.X = X
+            self.Y = Y
 
     # test model on given test data
     def test(self, X, Y):
@@ -50,17 +51,23 @@ class LinearRegression:
                 misclassified += 1
         return misclassified
 
+    # get the leave one out cross validation error
     def getLOOE(self):
+        # skip if not trained
         if self.X is None or self.Y is None:
             return None
+        # save old values of w0 and w1
+        best_w0, best_w1 = self.w0, self.w1
         errors = []
         for i in range(self.Y.size):
             temp_X = np.copy(self.X)
             temp_Y = np.copy(self.Y)
             temp_X = np.delete(temp_X, i, 0)
             temp_Y = np.delete(temp_Y, i, 0)
+            self.train(temp_X, temp_Y, store_data=False)
             error = self.test(temp_X, temp_Y)
             errors.append(error/temp_Y.size)
+        self.w0, self.w1 = best_w0, best_w1
         sum = 0
         for e in errors:
             sum += e
@@ -96,5 +103,6 @@ class LinearRegression:
         x_max = np.max(self.X)
         dec1 = hyperplane(x_min, self.w1, self.w0, 0)
         dec2 = hyperplane(x_max, self.w1, self.w0, 0)
-        plt.plot([x_min, x_max], [dec1, dec2], '--k')
+        plt.plot([x_min, x_max], [dec1, dec2], 'k', label="Decision Boundary")
+        plt.legend()
         plt.show()

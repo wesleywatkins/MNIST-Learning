@@ -2,12 +2,13 @@
 # wjw16
 
 # Import and Initializations
-import data as d
-import random
-import numpy as np
 import pandas as pd
 from svm import SupportVectorMachine
 
+# import data generator
+import sys
+sys.path.append("..")  # Adds higher directory to python modules path.
+import data as d
 
 # Generate sample data
 print("\nGenerating training data...")
@@ -17,14 +18,8 @@ print("Training data generated!")
 # Create and train support vector machine
 svm = SupportVectorMachine()
 print('\nTraining support vector machine...')
-svm.train(X, Y, 200)
+svm.train(X, Y, 5)
 print('Training complete!')
-print("Optimal w: [ ", end="")
-for i in range(svm.w.shape[0]):
-    print(round(svm.w[i].item(), 7), end=" ")
-print("]")
-print("Optimal b:", round(svm.b.item(), 7))
-print("Chosen C:", round(svm.C, 7))
 
 # plot the training points and decision boundary
 print('\nPlotting Decision Boundary...')
@@ -32,13 +27,17 @@ print("Plotted!")
 svm.visualize()
 
 # Get Info From SVM
-print('\nInfo About SVM:')
+print('\nCalculating margin length...')
 print('Margin Length:', round(svm.getMargin(), 4))
-print("Leave One Out Error <=", 100 * round(svm.getLOOE(), 2), "%")
+
+print("\nFinding support vectors...")
 sv = svm.getSupportVectors()
 print("Support Vectors ( Count =", len(sv), "):")
 for row in sv:
     print("(" + str(round(row[0], 7)) + ", " + str(round(row[1], 7)) + ")")
+
+print("\nCalculating leave one out cross validation error...")
+print("Leave one out error =", round(svm.getLOOE(1), 4))
 
 # Begin Test Phase
 print("\nGenerating test data...")

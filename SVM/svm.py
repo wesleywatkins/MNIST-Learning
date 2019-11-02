@@ -20,12 +20,14 @@ class SupportVectorMachine:
         self.w_vals = None
         self.b_vals = None
         self.C_vals = None
+        self.trials = None
 
     # train svm on given training data
     # also store the training data for plotting later
-    def train(self, X, Y, trials):
+    def train(self, X, Y, trials, store_data=True):
         # set info from data
-        self.X, self.Y = X, Y
+        if store_data:
+            self.X, self.Y, self.trials = X, Y, trials
         m, n = X.shape[0], X.shape[1]
         # setup optimization variables
         w = cp.Variable((n, 1))
@@ -42,7 +44,7 @@ class SupportVectorMachine:
         for i in range(trials):
             C.value = C_vals[i]
             prob.solve()
-            train_error = (self.Y != np.sign(X.dot(w.value) - b.value)).sum() / m
+            train_error = (Y != np.sign(X.dot(w.value) - b.value)).sum() / m
             if train_error < min_error:
                 min_error, min_error_i = train_error, i
             w_vals.append(w.value)
@@ -132,8 +134,24 @@ class SupportVectorMachine:
         return margins
 
     # LOOE <= SV / m+1
-    def getLOOE(self):
-        return len(self.getSupportVectors()) / (self.Y.size + 1)
+    def getLOOE(self, trials):
+        # skip if not trained
+        if self.X is None or self.Y is None:
+            return None
+        errors = []
+        for i in range(self.Y.size):
+            temp_X = np.copy(self.X)
+            temp_Y = np.copy(self.Y)
+            temp_X = np.delete(temp_X, i, 0)
+            temp_Y = np.delete(temp_Y, i, 0)
+            self.train(temp_X, temp_Y, trials, store_data=False)
+            error = self.test(temp_X, temp_Y)
+            errors.append(error / temp_Y.size)
+        self.train(self.X, self.Y, self.trials)  # retrain on real data
+        sum = 0
+        for e in errors:
+            sum += e
+        return sum / len(errors)
 
     # Get two points from drawing decision boundary line
     def getDecBound(self):

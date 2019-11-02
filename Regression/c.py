@@ -2,12 +2,16 @@
 # wjw16
 
 # imports
-from svm import SupportVectorMachine
 from linear import LinearRegression
 from logistic import LogisticRegression
 from mlxtend.data import loadlocal_mnist
 import os
 import numpy as np
+
+# Import SVM (avoid having two create two copies of SVM)
+import sys
+sys.path.append("../SVM/")  # Adds higher directory to python modules path.
+from svm import SupportVectorMachine
 
 # read in MNIST dataset
 print("Reading in MNIST dataset...")
@@ -76,38 +80,21 @@ print("Logistic regression trained!")
 
 # Test SVM
 print("\nRunning SVM on test data...")
-misclassified = 0
-for i in range(0, Y2.size):
-    prediction = svm.predict(X2[i])
-    actual = Y2[i]
-    if prediction != actual:
-        misclassified += 1
+misclassified = svm.test(X2, Y2)
 print("Generalization Error:", round(misclassified/Y2.size, 3))
 print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
 
 # Test Linear Regression
 print("\nRunning Linear Regression on test data...")
-misclassified = 0
-for i in range(0, Y2.size):
-    prediction = linear.predict(X2[i])
-    actual = Y2[i]
-    if prediction != actual:
-        misclassified += 1
+misclassified = linear.test(X2, Y2)
 print("Generalization Error:", round(misclassified/Y2.size, 3))
 print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
-
 
 # Test Logistic Regression
 print("\nRunning Logistic Regression on test data...")
-misclassified = 0
-for i in range(0, Y2.size):
-    prediction = logistic.predict(X2[i])
-    actual = Y2[i]
-    if prediction != actual:
-        misclassified += 1
+misclassified = logistic.test(X2, Y2)
 print("Generalization Error:", round(misclassified/Y2.size, 3))
 print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
-
