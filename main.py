@@ -2,6 +2,8 @@
 # wjw16
 
 # imports
+from linear import LinearRegression
+from logistic import LogisticRegression
 from svm import SupportVectorMachine
 from mlxtend.data import loadlocal_mnist
 import os
@@ -11,12 +13,12 @@ import numpy as np
 print("Reading in MNIST dataset...")
 dir_path = os.path.dirname(os.path.realpath(__file__))
 X_train, Y_train = loadlocal_mnist(
-    images_path=os.path.join(dir_path, '../Samples/train-images.idx3-ubyte'),
-    labels_path=os.path.join(dir_path, '../Samples/train-labels.idx1-ubyte')
+    images_path=os.path.join(dir_path, 'Samples/train-images.idx3-ubyte'),
+    labels_path=os.path.join(dir_path, 'Samples/train-labels.idx1-ubyte')
 )
 X_test, Y_test = loadlocal_mnist(
-    images_path=os.path.join(dir_path, '../Samples/t10k-images.idx3-ubyte'),
-    labels_path=os.path.join(dir_path, '../Samples/t10k-labels.idx1-ubyte')
+    images_path=os.path.join(dir_path, 'Samples/t10k-images.idx3-ubyte'),
+    labels_path=os.path.join(dir_path, 'Samples/t10k-labels.idx1-ubyte')
 )
 print("Reading complete!")
 
@@ -62,8 +64,33 @@ svm = SupportVectorMachine()
 svm.train(X, Y, 1)
 print("SVM trained!")
 
-print("\nRunning test data...")
+print("\nTraining Linear Regression on MNIST dataset...")
+linear = LinearRegression()
+linear.train(X, Y)
+print("Linear regression trained!")
+
+print("\nTraining Logistic Regression on MNIST dataset...")
+logistic = LogisticRegression()
+logistic.train(X, Y)
+print("Logistic regression trained!")
+
+# Test SVM
+print("\nRunning SVM on test data...")
 misclassified = svm.test(X2, Y2)
+print("Generalization Error:", round(misclassified/Y2.size, 3))
+print("Misclassified:", misclassified, "/", Y2.size)
+print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
+
+# Test Linear Regression
+print("\nRunning Linear Regression on test data...")
+misclassified = linear.test(X2, Y2)
+print("Generalization Error:", round(misclassified/Y2.size, 3))
+print("Misclassified:", misclassified, "/", Y2.size)
+print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
+
+# Test Logistic Regression
+print("\nRunning Logistic Regression on test data...")
+misclassified = logistic.test(X2, Y2)
 print("Generalization Error:", round(misclassified/Y2.size, 3))
 print("Misclassified:", misclassified, "/", Y2.size)
 print("Accuracy (on test data):", round((1 - (misclassified/Y2.size)) * 100, 3), '%')
